@@ -59,9 +59,11 @@ sed -i "/\/usr\/local\/bin\/openauto/ i \\/home/pi/.openauto/scripts/camera &\\"
 cat ./splitscreen >> /home/pi/.profile
 
 # openauto-helper
-# git clone https://github.com/b0czek/openauto-helper
-# cd openauto-helper
-# apt install nodejs npm
-# npm install -g yarn
-# yarn
-# yarn build
+git clone https://github.com/b0czek/openauto-helper
+cd openauto-helper
+apt install nodejs npm
+npm install -g yarn
+yarn
+yarn build
+# add to autorun
+sed -i "1 i@/home/pi/openauto-helper/dist/openauto-helper.AppImage" /etc/xdg/lxsession/LXDE-pi/autostart

@@ -1,0 +1,54 @@
+#!/bin/bash
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
+fi
+
+# copy boot config files
+cp ./boot/* /boot
+
+# blacklist cdrom for modem
+echo -e "cdrom\n sr_mod" >> /etc/modprobe.d/raspi-blacklist.conf
+
+# rc.local
+insert_rc() {
+    # insert before exit 0
+    sed -i "/exit 0/i\\$1\\" /etc/rc.local
+}
+
+insert_rc "echo ds1307 0x68 > /sys/class/i2c-adapter/i2c-1/new_device"
+insert_rc "hwclock -s"
+
+# openauto directory
+cp -r .openauto /home/pi/
+# add license key
+read -p "License key: " key
+echo $key > /home/pi/.openauto/openauto_license.dat
+
+# git clone https://github.com/phillipberndt/fakexrandr
+# apt-get install xorg-dev libglu1-mesa-dev build-essential python3-gi python-gi-dev python-gi-cairo
+# mkdir /usr/local/lib/fakexrandr
+# echo "/usr/local/lib/fakexrandr" > /etc/ld.so.conf.d/afakexrandr.conf
+# cd fakexrandr
+
+# disable ipv6 (speeds up boot time)
+sed -i '/interface wlan0/ a \\    noipv6\\' /etc/dhcpcd.conf
+sed -i '/interface wlan0/ a \\    ipv4only\\' /etc/dhcpcd.conf
+
+# fix audio
+sed -i '/load-module module-udev-detect ignore_dB=1/ c \\load-module module-udev-detect tsched=0 ignore_dB=1\\' /home/pi/.config/pulse/default.pa
+sed -i '/resample-method = soxr-vhq/ c \\; resample-method = soxr-vhq\\' /home/pi/.config/pulse/daemon.conf
+
+# routing
+sed -i '/#net.ipv4.ip_forward=1/ c \\net.ipv4.ip_forward=1\\' /etc/sysctl.d/99-sysctl.conf
+apt install netfilter-persistent iptables-persistent
+iptables -t nat -A POSTROUTING -o wwan0 -j MASQUERADE
+netfilter-persistent save
+
+# openauto-helper
+# git clone https://github.com/b0czek/openauto-helper
+# cd openauto-helper
+# apt install nodejs npm
+# npm install -g yarn
+# yarn
+# yarn build

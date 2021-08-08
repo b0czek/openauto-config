@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+CAMERA_GPIO=13
+CAMERA_PATH=/dev/video0
+
+export_gpio() {
+    echo EXPORTING GPIO
+    sudo bash -c "echo $CAMERA_GPIO > /sys/class/gpio/export"
+    sudo bash -c "echo out > /sys/class/gpio/gpio$CAMERA_GPIO/direction"
+}
+# wait for the initial camera opening
+inotifywait -q -e open $CAMERA_PATH
+echo $(date) > ~/camera.log
+[ -d "/sys/class/gpio/gpio$CAMERA_GPIO" ] || export_gpio
+inotifywait -q -m -e open $CAMERA_PATH |
+    while read events; do
+        echo opening camera $(date) >> ~/camera.log
+	sudo bash -c "echo 1 > /sys/class/gpio/gpio$CAMERA_GPIO/value"
+        inotifywait -q -e close $CAMERA_PATH
+        sleep 2
+        [[ $(lsof $CAMERA_PATH) ]] || sudo bash -c "echo 0 > /sys/class/gpio/gpio$CAMERA_GPIO/value"
+        inotifywait -q -e open $CAMERA_PATH
+        echo closing camera $(date) >> ~/camera.log
+
+    done
+
+
+
+

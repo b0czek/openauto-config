@@ -1,0 +1,24 @@
+# Enable audio (loads snd_bcm2835)
+dtparam=audio=on
+dtoverlay=disable-bt
+disable_splash=1
+dtoverlay=vc4-fkms-v3d
+
+max_framebuffers=2
+hvs_priority=0x32ff
+gpu_mem=64
+max_usb_current=1
+#hdmi_group=2
+#hdmi_mode=77
+
+
+
+dtoverlay=i2c-gpio,bus=1,i2c_gpio_sda=0,i2c_gpio_scl=1
+dtoverlay=w1-gpio,gpiopin=25,pullup=1
+dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up
+#dtparam=i2c_arm=on
+dtoverlay=rtc-i2c,ds1307
+
+over_voltage=6
+arm_freq=2000
+gpu_freq=700

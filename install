@@ -4,14 +4,17 @@ if [ "$EUID" -ne 0 ]
   exit
 fi
 # update mirror list 
+export DEBIAN_FRONTEND=noninteractive
 apt update
-
+echo "Copying boot config files"
 # copy boot config files
 cp ./boot/* /boot
 
+echo "Blacklisting cdrom modules"
 # blacklist cdrom for modem
 echo -e "cdrom\n sr_mod" >> /etc/modprobe.d/raspi-blacklist.conf
 
+echo "Adding commands to rc.local"
 # rc.local
 insert_rc() {
     # insert before exit 0
@@ -20,50 +23,55 @@ insert_rc() {
 
 insert_rc "echo ds1307 0x68 > /sys/class/i2c-adapter/i2c-1/new_device"
 insert_rc "hwclock -s"
-
+echo "Copying openauto config files"
 # openauto directory
 cp -r .openauto /home/pi/
 # add license key
 read -p "License key: " key
 echo $key > /home/pi/.openauto/openauto_license.dat
 
-# git clone https://github.com/phillipberndt/fakexrandr
-# apt-get install xorg-dev libglu1-mesa-dev build-essential python3-gi python-gi-dev python-gi-cairo
-# mkdir /usr/local/lib/fakexrandr
-# echo "/usr/local/lib/fakexrandr" > /etc/ld.so.conf.d/afakexrandr.conf
-# cd fakexrandr
-
+echo "Disabling ipv6"
 # disable ipv6 (speeds up boot time)
 sed -i "/interface wlan0/ a \\    noipv6\\" /etc/dhcpcd.conf
 sed -i "/interface wlan0/ a \\    ipv4only\\" /etc/dhcpcd.conf
 
+echo "Fixing audio"
 # fix audio
 sed -i "/load-module module-udev-detect ignore_dB=1/ c \\load-module module-udev-detect tsched=0 ignore_dB=1\\" /home/pi/.config/pulse/default.pa
 sed -i "/resample-method = soxr-vhq/ c \\resample-method = soxr-hq\\" /home/pi/.config/pulse/daemon.conf
 
+echo "Setting up modem routing"
 # routing
 sed -i "/#net.ipv4.ip_forward=1/ c \\net.ipv4.ip_forward=1\\" /etc/sysctl.d/99-sysctl.conf
-apt install netfilter-persistent iptables-persistent
+apt install -y netfilter-persistent iptables-persistent
 iptables -t nat -A POSTROUTING -o wwan0 -j MASQUERADE
 netfilter-persistent save
 
+echo "Disabling pcmanfm autorun"
 # disable media pcmanfm
 sed -i "/mount_on_startup=1/ c \\mount_on_startup=0" /home/pi/.config/pcmanfm/LXDE-pi/pcmanfm.conf
 sed -i "/mount_removable=1/ c \\mount_removable=0" /home/pi/.config/pcmanfm/LXDE-pi/pcmanfm.conf
 
+echo "Enabling camera"
 # add camera script to autostart
 apt install -y inotify-tools
 sed -i "/\/usr\/local\/bin\/openauto/ i \\/home/pi/.openauto/scripts/camera &\\" /etc/xdg/lxsession/LXDE-pi/autostart
 
+echo "Configuring screen splitting"
 # split screen
 cat ./splitscreen >> /home/pi/.profile
 
+echo "Setting up openauto-helper"
 # openauto-helper
 git clone https://github.com/b0czek/openauto-helper
 cd openauto-helper
-apt install nodejs npm
+echo "installing nodejs"
+apt install -y nodejs npm
+echo "installing yarn"
 npm install -g yarn
+echo "installing dependencies"
 yarn
+echo "building binary"
 yarn build
 # add to autorun
 sed -i "1 i@/home/pi/openauto-helper/dist/openauto-helper.AppImage" /etc/xdg/lxsession/LXDE-pi/autostart

@@ -63,6 +63,7 @@ echo "Configuring screen splitting"
 cat ./splitscreen >> /home/pi/.profile
 
 echo "Setting up openauto-helper"
+cd /home/pi
 # openauto-helper
 git clone https://github.com/b0czek/openauto-helper
 cd openauto-helper

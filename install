@@ -34,25 +34,25 @@ echo $key > /home/pi/.openauto/openauto_license.dat
 # cd fakexrandr
 
 # disable ipv6 (speeds up boot time)
-sed -i '/interface wlan0/ a \\    noipv6\\' /etc/dhcpcd.conf
-sed -i '/interface wlan0/ a \\    ipv4only\\' /etc/dhcpcd.conf
+sed -i "/interface wlan0/ a \\    noipv6\\" /etc/dhcpcd.conf
+sed -i "/interface wlan0/ a \\    ipv4only\\" /etc/dhcpcd.conf
 
 # fix audio
 sed -i "/load-module module-udev-detect ignore_dB=1/ c \\load-module module-udev-detect tsched=0 ignore_dB=1\\" /home/pi/.config/pulse/default.pa
 sed -i "/resample-method = soxr-vhq/ c \\resample-method = soxr-hq\\" /home/pi/.config/pulse/daemon.conf
 
 # routing
-sed -i '/#net.ipv4.ip_forward=1/ c \\net.ipv4.ip_forward=1\\' /etc/sysctl.d/99-sysctl.conf
+sed -i "/#net.ipv4.ip_forward=1/ c \\net.ipv4.ip_forward=1\\" /etc/sysctl.d/99-sysctl.conf
 apt install netfilter-persistent iptables-persistent
 iptables -t nat -A POSTROUTING -o wwan0 -j MASQUERADE
 netfilter-persistent save
 
 # disable media pcmanfm
-sed -i '/mount_on_startup=1/ c \\mount_on_startup=0' /home/pi/.config/pcmanfm/LXDE-pi/pcmanfm.conf
-sed -i '/mount_removable=1/ c \\mount_removable=0' /home/pi/.config/pcmanfm/LXDE-pi/pcmanfm.conf
+sed -i "/mount_on_startup=1/ c \\mount_on_startup=0" /home/pi/.config/pcmanfm/LXDE-pi/pcmanfm.conf
+sed -i "/mount_removable=1/ c \\mount_removable=0" /home/pi/.config/pcmanfm/LXDE-pi/pcmanfm.conf
 
 # add camera script to autostart
-sed -i '/\/usr\/local\/bin\/openauto/ i \\/home/pi/.openauto/scripts/camera\\' autostart
+sed -i "/\/usr\/local\/bin\/openauto/ i \\/home/pi/.openauto/scripts/camera &\\" /etc/xdg/lxsession/LXDE-pi/autostart
 
 
 # openauto-helper

@@ -18,11 +18,12 @@ echo "Adding commands to rc.local"
 # rc.local
 insert_rc() {
     # insert before exit 0
-    sed -i "/exit 0/i\\$1\\" /etc/rc.local
+    sed -i "`wc -l < /etc/rc.local`i\\$1\\" /etc/rc.local
 }
 
 insert_rc "echo ds1307 0x68 > /sys/class/i2c-adapter/i2c-1/new_device"
 insert_rc "hwclock -s"
+
 echo "Copying openauto config files"
 # openauto directory
 cp -r .openauto /home/pi/

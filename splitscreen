@@ -1,6 +1,6 @@
 
 #run split screening only when in real tty
-if [[ -z "$DISPLAY" ]] && [[ $(tty) =~ /dev/tty? ]]; then
+#if [[ -z "$DISPLAY" ]] && [[ $(tty) =~ /dev/tty? ]]; then
 xrandr --setmonitor HDMI-1~1 2110/158x1600/120+450+0 HDMI-1
 xrandr --setmonitor HDMI-1~2 450/34x1600/120+0+0 none
-fi
+#fi

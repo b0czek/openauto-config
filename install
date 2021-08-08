@@ -52,6 +52,7 @@ sed -i "/mount_on_startup=1/ c \\mount_on_startup=0" /home/pi/.config/pcmanfm/LX
 sed -i "/mount_removable=1/ c \\mount_removable=0" /home/pi/.config/pcmanfm/LXDE-pi/pcmanfm.conf
 
 # add camera script to autostart
+apt install -y inotify-tools
 sed -i "/\/usr\/local\/bin\/openauto/ i \\/home/pi/.openauto/scripts/camera &\\" /etc/xdg/lxsession/LXDE-pi/autostart
 
 

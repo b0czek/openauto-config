@@ -12,7 +12,7 @@ cp ./boot/* /boot
 
 echo "Blacklisting cdrom modules"
 # blacklist cdrom for modem
-echo -e "cdrom\n sr_mod" >> /etc/modprobe.d/raspi-blacklist.conf
+echo -e "cdrom\nsr_mod" >> /etc/modprobe.d/raspi-blacklist.conf
 
 echo "Adding commands to rc.local"
 # rc.local

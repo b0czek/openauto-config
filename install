@@ -55,6 +55,8 @@ sed -i "/mount_removable=1/ c \\mount_removable=0" /home/pi/.config/pcmanfm/LXDE
 apt install -y inotify-tools
 sed -i "/\/usr\/local\/bin\/openauto/ i \\/home/pi/.openauto/scripts/camera &\\" /etc/xdg/lxsession/LXDE-pi/autostart
 
+# split screen
+cat ./splitscreen >> /home/pi/.profile
 
 # openauto-helper
 # git clone https://github.com/b0czek/openauto-helper

@@ -62,6 +62,9 @@ echo "Configuring screen splitting"
 # split screen
 cat ./splitscreen >> /home/pi/.profile
 
+echo "Uninstalling narrator"
+sudo apt remove -y orca
+
 echo "Setting up openauto-helper"
 cd /home/pi
 # openauto-helper

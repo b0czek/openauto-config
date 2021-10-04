@@ -1,0 +1,121 @@
+from gpiozero import DigitalInputDevice
+from vcgencmd import Vcgencmd
+
+from threading import Timer, Event
+import os
+import json
+
+
+with open('pwrmgr.json', 'r') as r:
+    config = json.load(r)
+
+
+IGNITION_PIN = config['ignition_pin']
+POWERBUTTON_PIN = config['powerbutton_pin']
+
+POWEROFF_TIME = config['poweroff_time']
+SCREENOFF_TIME = config['screenoff_time']
+POWERBUTTON_HOLD_TIME = config['powerbutton_hold_time']
+
+DISP_ID = config['disp_id']
+
+vcgm = Vcgencmd()
+
+poweroff_timer: Timer = None
+screenoff_timer: Timer = None
+buttonhold_timer: Timer = None
+
+
+def system_poweroff():
+    os.system("sudo poweroff")
+
+
+def screenoff():
+    print('turning screen off')
+    vcgm.display_power_off(DISP_ID)
+
+
+def screenon():
+    print('turning screen on')
+    vcgm.display_power_on(DISP_ID)
+
+
+def screenstate():
+    return vcgm.display_power_state(DISP_ID)
+
+
+def on_ignition_on():
+    print('ignition on')
+
+    global poweroff_timer
+    global screenoff_timer
+
+    if poweroff_timer:
+        poweroff_timer.cancel()
+        poweroff_timer = None
+    if screenoff_timer:
+        screenoff_timer.cancel()
+        screenoff_timer = None
+    if screenstate() == 'off':
+        screenon()
+
+
+def on_ignition_off():
+    print('ignition off, powering off in {} seconds'. format(POWEROFF_TIME))
+
+    global poweroff_timer
+    global screenoff_timer
+
+    poweroff_timer = Timer(POWEROFF_TIME, system_poweroff)
+    poweroff_timer.start()
+    screenoff_timer = Timer(SCREENOFF_TIME, screenoff)
+    screenoff_timer.start()
+
+
+def on_powerbutton_release():
+    global buttonhold_timer
+    print('power button clicked')
+
+    # if button is released before timer has finished
+    if buttonhold_timer:
+        print('cancelling button poweroff')
+        buttonhold_timer.cancel()
+        buttonhold_timer = None
+
+    screenon() if screenstate() == 'off' else screenoff()
+
+
+def on_powerbutton_press():
+    global buttonhold_timer
+    buttonhold_timer = Timer(POWERBUTTON_HOLD_TIME, on_powerbutton_held)
+    buttonhold_timer.start()
+
+
+def on_powerbutton_held():
+    global buttonhold_timer
+    print('powerbutton held')
+    buttonhold_timer = None
+    system_poweroff()
+
+
+def main():
+    ignition = DigitalInputDevice(
+        IGNITION_PIN, pull_up=False, bounce_time=0.05)
+    powerbutton = DigitalInputDevice(POWERBUTTON_PIN,  pull_up=True,
+                                     bounce_time=0.01,
+                                     )
+    if ignition.value == 0:
+        on_ignition_off()
+
+    ignition.when_activated = on_ignition_on
+    ignition.when_deactivated = on_ignition_off
+    powerbutton.when_activated = on_powerbutton_press
+    powerbutton.when_deactivated = on_powerbutton_release
+
+    event = Event()
+    while True:
+        event.wait()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,11 @@
+[Unit]
+Description=pwrmgr restarter
+After=networking.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/systemctl restart pwrmgr.service
+
+[Install]
+WantedBy=multi-user.target

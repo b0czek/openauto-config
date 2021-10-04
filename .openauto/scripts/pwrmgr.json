@@ -1,0 +1,12 @@
+{
+    "ignition_pin": 21,
+    "powerbutton_pin": 3,
+    "poweroff_time": 3300,
+    "screenoff_time": 10,
+    "powerbutton_hold_time": 5,
+    "disp_id": 2
+}
+
+
+
+

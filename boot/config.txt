@@ -15,7 +15,7 @@ max_usb_current=1
 
 dtoverlay=i2c-gpio,bus=1,i2c_gpio_sda=0,i2c_gpio_scl=1
 dtoverlay=w1-gpio,gpiopin=25,pullup=1
-dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up
+#dtoverlay=gpio-shutdown,gpio_pin=3,active_low=1,gpio_pull=up
 #dtparam=i2c_arm=on
 dtoverlay=rtc-i2c,ds1307
 

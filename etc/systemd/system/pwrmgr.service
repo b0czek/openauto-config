@@ -1,0 +1,15 @@
+[Unit]
+Description=Power Manager
+After=networking.service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=pwrmgr
+WorkingDirectory=/home/pi/.openauto/scripts
+ExecStart=/usr/bin/python3 /home/pi/.openauto/scripts/pwrmgr.py
+
+[Install]
+WantedBy=multi-user.target

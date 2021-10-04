@@ -64,12 +64,12 @@ cat ./splitscreen >> /home/pi/.profile
 
 echo "Uninstalling narrator"
 sudo apt remove -y orca
-vcgencmd display_power 1 2
+
 echo "Setting up power manager"
 pip3 install -r requirements.txt
 useradd pwrmgr
 usermod -aG gpio,video pwrmgr
-echo "pwrmgr ALL=(root:root) NOPASSWD: /usr/bin/dtoverlay, /usr/sbin/poweroff" > /etc/sudoers.d/pwrmgr
+echo "pwrmgr ALL=(root:root) NOPASSWD: /usr/bin/dtoverlay, /usr/sbin/poweroff, /sbin/poweroff" > /etc/sudoers.d/pwrmgr
 cp -r ./etc /etc
 systemctl enable pwrmgr
 systemctl start pwrmgr 

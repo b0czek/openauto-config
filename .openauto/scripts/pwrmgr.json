@@ -5,5 +5,5 @@
     "screenoff_time": 10,
     "powerbutton_hold_time": 5,
     "disp_id": 7,
-    "camera_gpio": 20
+    "camera_pin": 20
 }

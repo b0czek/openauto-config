@@ -36,9 +36,6 @@ def system_poweroff():
 
 
 def screenoff():
-    if ignition.value or camera.value:
-        print('not turning screen off because ignition or camera is still on')
-        return
     print('turning screen off')
     vcgm.display_power_off(DISP_ID)
 
@@ -53,6 +50,9 @@ def screenstate():
 
 
 def schedule_screenoff():
+    if ignition.value or camera.value:
+        print('not turning screen off because ignition or camera is still on')
+        return
     global screenoff_timer
     screenoff_timer = Timer(SCREENOFF_TIME, screenoff)
     screenoff_timer.start()
@@ -114,21 +114,12 @@ def on_powerbutton_held():
     system_poweroff()
 
 
-was_screen_off = False
-
-
 def on_camera_on():
     global was_screen_off
 
     cancel_screenoff()
     if screenstate() == 'off':
         screenon()
-        was_screen_off = True
-
-
-def on_camera_off():
-    if was_screen_off:
-        schedule_screenoff()
 
 
 def main():
@@ -141,7 +132,6 @@ def main():
     powerbutton.when_activated = on_powerbutton_press
     powerbutton.when_deactivated = on_powerbutton_release
     camera.when_activated = on_camera_on
-    camera.when_deactivated = on_camera_off
 
     event = Event()
     while True:
